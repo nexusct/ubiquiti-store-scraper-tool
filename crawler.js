@@ -7,6 +7,7 @@ import pLimit from 'p-limit';
 
 import config from './config.js';
 import * as utils from './utils.js';
+import { ProductParser } from './product-parser.js';
 
 /**
  * Main crawler class
@@ -180,16 +181,18 @@ export class UbiquitiCrawler {
       // Get page content
       const html = await page.content();
       
-      // Extract product information
-      const productName = utils.extractProductName(html);
-      const productDescription = utils.extractProductDescription(html);
+      // Extract product information using the ProductParser
+      const product = ProductParser.extractProductInfo(html, url);
+      
+      // Generate markdown content
+      const markdownContent = ProductParser.toMarkdown(product);
       
       // Determine product category
-      const category = utils.determineCategory(productName, url, config.categories);
+      const category = utils.determineCategory(product.name, url, config.categories);
       
       // Sanitize names for use in paths
       const sanitizedCategory = utils.sanitizeName(category);
-      const sanitizedProduct = utils.sanitizeName(productName);
+      const sanitizedProduct = utils.sanitizeName(product.name);
       
       // Create product directory
       const productDir = path.join(
@@ -205,19 +208,30 @@ export class UbiquitiCrawler {
       await utils.ensureDir(path.join(productDir, 'pdfs'));
       
       // Save product information
-      const productInfo = `# ${productName}\n\n${productDescription}\n\nURL: ${url}\n`;
-      await fs.writeFile(path.join(productDir, 'product_info.md'), productInfo, 'utf8');
+      await fs.writeFile(path.join(productDir, 'product_info.md'), markdownContent, 'utf8');
       
       // Append to all_content.txt
       const allContentEntry = `
 ====================================
-${category} - ${productName}
+${category} - ${product.name}
 ====================================
-${productDescription}
+${product.description}
+
+Price: ${product.price}
+
+Features:
+${product.features.map(feature => `- ${feature}`).join('\n')}
+
 URL: ${url}
 ====================================
 `;
       await utils.appendToFile(this.allContentPath, allContentEntry);
+      
+      // Take a screenshot of the product page
+      await page.screenshot({ 
+        path: path.join(productDir, 'screenshot.png'),
+        fullPage: false 
+      });
       
       // Extract and download images
       const imageLinks = utils.extractLinks(html, config.fileTypes.images, url);
