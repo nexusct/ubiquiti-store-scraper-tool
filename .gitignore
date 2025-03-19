@@ -1,0 +1,25 @@
+# Dependency directories
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Output directory
+ubiquiti_store/
+
+# Environment variables
+.env
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
