@@ -1,28 +1,34 @@
-# Ubiquiti Store Scraper Tool
+# Ubiquiti Website Scraper Tool
 
-This tool downloads all pages and product information including images, videos, and PDF files from the Ubiquiti store website (https://store.ui.com/us/*). It organizes the information into folders by product category and name, and creates a consolidated text file with all content.
+This tool downloads all pages and assets including images, videos, PDFs, CSS, JavaScript, and fonts from the Ubiquiti website (https://ui.com). It organizes the content into folders by page and asset type, and creates a consolidated text file with all content.
 
 ## Features
 
-- Crawls all product pages from the Ubiquiti store
-- Downloads images, videos, and PDF files
-- Organizes content into folders by product category and name
-- Creates a single text file with all parsed text, organized by sections
+- Crawls all pages from the Ubiquiti website
+- Downloads all asset types: images, videos, PDFs, CSS, JavaScript, and fonts
+- Organizes content into folders by page and asset type
+- Takes screenshots of each page
+- Saves page HTML for offline viewing
+- Creates a single text file with all page titles and URLs
+- Avoids duplicate asset downloads
 
 ## Folder Structure
 
 ```
-ubiquiti_store/
-├── products/
-│   ├── [category1]/
-│   │   ├── [product1]/
-│   │   │   ├── images/
-│   │   │   ├── videos/
-│   │   │   ├── pdfs/
-│   │   │   └── product_info.md
-│   │   └── [product2]/
-│   ├── [category2]/
+ui_com_assets/
+├── pages/
+│   ├── [page1]/
+│   │   ├── page.html
+│   │   └── screenshot.png
+│   ├── [page2]/
 │   └── ...
+├── assets/
+│   ├── images/
+│   ├── videos/
+│   ├── pdfs/
+│   ├── styles/
+│   ├── scripts/
+│   └── fonts/
 └── all_content.txt
 ```
 
@@ -53,18 +59,20 @@ npm start
 ```
 
 The script will:
-1. Crawl the Ubiquiti store website
-2. Download all product information, images, videos, and PDFs
-3. Organize everything into the appropriate folder structure
-4. Create a consolidated text file with all content
+1. Crawl the Ubiquiti website
+2. Download all page HTML and take screenshots
+3. Extract and download all assets (images, videos, PDFs, CSS, JavaScript, fonts)
+4. Organize everything into the appropriate folder structure
+5. Create a consolidated text file with all page information
 
 ## Configuration
 
 You can modify the `config.js` file to adjust:
-- Starting URL
+- Base URL (currently set to https://ui.com/)
 - Maximum number of pages to crawl
 - Download location
-- File types to download
+- File types to download (images, videos, PDFs, CSS, JS, fonts)
+- Crawl settings (concurrency, timeout, delay)
 
 ## License
 

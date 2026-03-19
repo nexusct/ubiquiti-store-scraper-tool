@@ -4,8 +4,9 @@ npm-debug.log
 yarn-error.log
 yarn-debug.log
 
-# Output directory
+# Output directories
 ubiquiti_store/
+ui_com_assets/
 
 # Environment variables
 .env
