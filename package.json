@@ -1,7 +1,7 @@
 {
   "name": "ubiquiti-store-scraper-tool",
   "version": "1.0.0",
-  "description": "A tool to download and organize all products and information from the Ubiquiti store website",
+  "description": "A tool to download and organize all pages and assets (images, videos, PDFs, CSS, JavaScript, fonts) from the Ubiquiti website",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,7 +10,10 @@
     "scraper",
     "crawler",
     "ubiquiti",
-    "ui.com"
+    "ui.com",
+    "assets",
+    "images",
+    "web-scraper"
   ],
   "author": "",
   "license": "MIT",

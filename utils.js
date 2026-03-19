@@ -18,7 +18,7 @@ export const ensureDir = async (dirPath) => {
  * @returns {string} Sanitized name
  */
 export const sanitizeName = (name) => {
-  return sanitize(name.trim()).replace(/\\s+/g, '_');
+  return sanitize(name.trim()).replace(/\s+/g, '_');
 };
 
 /**
@@ -123,7 +123,7 @@ export const extractLinks = (html, fileExtensions, baseUrl) => {
  */
 export const appendToFile = async (filePath, text) => {
   await fs.ensureFile(filePath);
-  await fs.appendFile(filePath, text + '\\n', 'utf8');
+  await fs.appendFile(filePath, text + '\n', 'utf8');
 };
 
 /**
@@ -132,20 +132,20 @@ export const appendToFile = async (filePath, text) => {
  * @returns {string} Product name
  */
 export const extractProductName = (html) => {
-  const titleMatch = html.match(/<title>([^<]+)<\\/title>/);
+  const titleMatch = html.match(/<title>([^<]+)<\/title>/);
   if (titleMatch && titleMatch[1]) {
     // Clean up the title (remove "- Ubiquiti Store" etc.)
     let title = titleMatch[1].trim();
-    title = title.replace(/\\s*[\\-|]\\s*Ubiquiti.*$/i, '');
+    title = title.replace(/\s*[\-|]\s*Ubiquiti.*$/i, '');
     return title;
   }
-  
+
   // Fallback to h1
-  const h1Match = html.match(/<h1[^>]*>([^<]+)<\\/h1>/);
+  const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
   if (h1Match && h1Match[1]) {
     return h1Match[1].trim();
   }
-  
+
   return 'Unknown Product';
 };
 
@@ -156,17 +156,17 @@ export const extractProductName = (html) => {
  */
 export const extractProductDescription = (html) => {
   // Look for meta description first
-  const metaMatch = html.match(/<meta\\s+name=["']description["']\\s+content=["']([^"']+)["']/i);
+  const metaMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
   if (metaMatch && metaMatch[1]) {
     return metaMatch[1].trim();
   }
-  
+
   // Look for product description in the page content
-  const descMatch = html.match(/<div[^>]*class=["'][^"']*product-description[^"']*["'][^>]*>([\\s\\S]*?)<\\/div>/i);
+  const descMatch = html.match(/<div[^>]*class=["'][^"']*product-description[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
   if (descMatch && descMatch[1]) {
     // Remove HTML tags
-    return descMatch[1].replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();
+    return descMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   }
-  
+
   return '';
 };
