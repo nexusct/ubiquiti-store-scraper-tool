@@ -4,8 +4,14 @@ npm-debug.log
 yarn-error.log
 yarn-debug.log
 
-# Output directory
+# Output directories
 ubiquiti_store/
+ui_com_assets/
+ui_com_assets_test/
+
+# Test files
+test.js
+test-config.js
 
 # Environment variables
 .env

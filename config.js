@@ -1,20 +1,23 @@
-// Configuration for the Ubiquiti store scraper
+// Configuration for the Ubiquiti scraper
 
 export default {
-  // Base URL of the Ubiquiti store
-  baseUrl: 'https://store.ui.com/us/',
-  
+  // Base URL of the Ubiquiti website
+  baseUrl: 'https://ui.com/',
+
   // Maximum number of pages to crawl (set to a high number to get everything)
-  maxPages: 1000,
-  
+  maxPages: 2000,
+
   // Output directory where all content will be saved
-  outputDir: './ubiquiti_store',
-  
+  outputDir: './ui_com_assets',
+
   // File types to download
   fileTypes: {
-    images: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'],
-    videos: ['.mp4', '.webm', '.mov'],
-    pdfs: ['.pdf']
+    images: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.ico', '.bmp'],
+    videos: ['.mp4', '.webm', '.mov', '.avi', '.ogv'],
+    pdfs: ['.pdf'],
+    styles: ['.css'],
+    scripts: ['.js'],
+    fonts: ['.woff', '.woff2', '.ttf', '.otf', '.eot']
   },
   
   // Crawling settings
@@ -33,34 +36,39 @@ export default {
   },
   
   // Product categories to look for
-  // This helps organize products into the right folders
+  // This helps organize content into the right folders
   categories: [
-    'Networks',
-    'Protect',
-    'Access',
-    'Talk',
-    'Connect',
-    'Cameras',
-    'Door Access',
-    'Accessories',
-    'Sensors',
-    'Antennas'
+    'Products',
+    'Solutions',
+    'Resources',
+    'Support',
+    'Community',
+    'Company',
+    'Store',
+    'Other'
   ],
-  
+
   // Patterns to include/exclude from crawling
   patterns: {
-    // Include only product pages and category pages
+    // Include all ui.com pages
     include: [
-      '/us/products/',
-      '/us/collections/'
+      '/products',
+      '/solutions',
+      '/resources',
+      '/support',
+      '/community',
+      '/company',
+      '/'
     ],
     // Exclude unwanted URLs
     exclude: [
       '/cart',
       '/account',
-      '/search',
-      '/pages/',
-      '/policies/'
+      '/checkout',
+      '/login',
+      '/logout',
+      '?',
+      '#'
     ]
   }
 };
