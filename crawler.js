@@ -92,11 +92,69 @@ export class UbiquitiCrawler {
   }
 
   /**
+   * Validates that a URL is safe to crawl
+   * @param {string} urlString - URL to validate
+   * @returns {boolean} True if URL is safe to crawl
+   */
+  isSafeUrl(urlString) {
+    try {
+      const parsedUrl = new URL(urlString);
+      
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        return false;
+      }
+      
+      const hostname = parsedUrl.hostname.toLowerCase();
+      const blockedPatterns = [
+        'localhost',
+        '127.0.0.1',
+        '0.0.0.0',
+        '[::]',
+        '::1',
+        '169.254.',
+        '10.',
+        '172.16.',
+        '172.17.',
+        '172.18.',
+        '172.19.',
+        '172.20.',
+        '172.21.',
+        '172.22.',
+        '172.23.',
+        '172.24.',
+        '172.25.',
+        '172.26.',
+        '172.27.',
+        '172.28.',
+        '172.29.',
+        '172.30.',
+        '172.31.',
+        '192.168.'
+      ];
+      
+      for (const pattern of blockedPatterns) {
+        if (hostname.includes(pattern)) {
+          return false;
+        }
+      }
+      
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Processes a single page
    * @param {string} url - URL of the page to process
    */
   async processPage(url) {
     try {
+      if (!this.isSafeUrl(url)) {
+        console.error(`Skipping unsafe URL: ${url}`);
+        return;
+      }
+      
       console.log(`Processing page: ${url}`);
       
       const page = await this.browser.newPage();
@@ -165,6 +223,11 @@ export class UbiquitiCrawler {
    */
   async processProductPage(url) {
     try {
+      if (!this.isSafeUrl(url)) {
+        console.error(`Skipping unsafe product URL: ${url}`);
+        return;
+      }
+      
       console.log(`Processing product page: ${url}`);
       
       const page = await this.browser.newPage();
