@@ -62,10 +62,25 @@ export const determineCategory = (productName, url, categories) => {
  */
 export const downloadFile = async (url, outputPath) => {
   try {
+    const parsedUrl = new URL(url);
+    
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      throw new Error(`Unsafe protocol: ${parsedUrl.protocol}`);
+    }
+    
+    const resolvedPath = path.resolve(outputPath);
+    const allowedBase = path.resolve(process.cwd());
+    
+    if (!resolvedPath.startsWith(allowedBase)) {
+      throw new Error('Path traversal attempt detected');
+    }
+    
     const response = await axios({
       method: 'GET',
       url: url,
-      responseType: 'stream'
+      responseType: 'stream',
+      maxRedirects: 5,
+      timeout: 30000
     });
     
     const writer = fs.createWriteStream(outputPath);
@@ -96,16 +111,20 @@ export const extractLinks = (html, fileExtensions, baseUrl) => {
     const url = match[1] || match[2];
     
     if (url) {
-      // Check if the URL has one of the specified extensions
       const hasMatchingExtension = fileExtensions.some(ext => 
         url.toLowerCase().endsWith(ext)
       );
       
       if (hasMatchingExtension) {
-        // Convert relative URL to absolute
         try {
-          const absoluteUrl = new URL(url, baseUrl).href;
-          links.push(absoluteUrl);
+          const absoluteUrl = new URL(url, baseUrl);
+          
+          if (!['http:', 'https:'].includes(absoluteUrl.protocol)) {
+            console.error(`Skipping unsafe protocol: ${absoluteUrl.protocol}`);
+            continue;
+          }
+          
+          links.push(absoluteUrl.href);
         } catch (error) {
           console.error(`Invalid URL: ${url}`);
         }
@@ -113,7 +132,7 @@ export const extractLinks = (html, fileExtensions, baseUrl) => {
     }
   }
   
-  return [...new Set(links)]; // Remove duplicates
+  return [...new Set(links)];
 };
 
 /**
