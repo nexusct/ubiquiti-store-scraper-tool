@@ -1,12 +1,11 @@
 # ==========================================================================
 # Nexus Communications Technology - Pre-commit Security Hooks
-# Last updated: 2026-04-19 after credential exposure incident
+# Last updated: 2026-08-17
 # ==========================================================================
 # SETUP (once per machine):
 #   pip install pre-commit
 #
 # SETUP (once per repo):
-#   cp .pre-commit-config.yaml <repo>/
 #   cd <repo>
 #   pre-commit install
 #
@@ -38,9 +37,9 @@ repos:
         entry: |
           bash -c '
           FAIL=0
-          # Known-bad admin password from the 2026-04-19 incident
+          # Known-bad admin password from past incidents
           if git diff --cached | grep -qE "nexus2026"; then
-            echo "❌ BLOCKED: commit contains the string \"nexus2026\" (retired admin password)."
+            echo "❌ BLOCKED: commit contains a retired admin password string."
             FAIL=1
           fi
           # Dealer cost marker (pricing-engine.js dealer data)
@@ -48,10 +47,10 @@ repos:
             echo "❌ BLOCKED: commit contains internal margin constant. Use NexusPricing.init()."
             FAIL=1
           fi
-          # Google Maps API key pattern (any AIza... key that is NOT in a .example.* file)
+          # Google Maps API key pattern (exclude .example.* and .template.* files)
           if git diff --cached --name-only | grep -vE "\.(example|template)\." | \
              xargs -I{} git diff --cached -- {} 2>/dev/null | grep -qE "AIza[0-9A-Za-z_-]{35}"; then
-            echo "❌ BLOCKED: commit contains a Google API key. Move to env var / config.local.js."
+            echo "❌ BLOCKED: commit contains a Google API key. Move to environment variable or gitignored config file."
             FAIL=1
           fi
           # AWS access keys
@@ -62,6 +61,16 @@ repos:
           # Private keys
           if git diff --cached | grep -qE "BEGIN (RSA |OPENSSH |EC |DSA |PGP )?PRIVATE KEY"; then
             echo "❌ BLOCKED: commit contains a private key."
+            FAIL=1
+          fi
+          # Stripe API keys
+          if git diff --cached | grep -qE "(sk|pk)_(test|live)_[0-9A-Za-z]{24,}"; then
+            echo "❌ BLOCKED: commit contains a Stripe API key."
+            FAIL=1
+          fi
+          # Generic high-entropy strings (potential secrets)
+          if git diff --cached | grep -qE "(api[_-]?key|secret|password|token)[[:space:]]*[=:][[:space:]]*['\''\"'][A-Za-z0-9+/=]{32,}['\''\"']"; then
+            echo "❌ BLOCKED: commit contains what appears to be a hardcoded secret."
             FAIL=1
           fi
           exit $FAIL
