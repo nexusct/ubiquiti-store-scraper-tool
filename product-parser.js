@@ -215,25 +215,39 @@ export class ProductParser {
   }
   
   /**
+   * Escapes special characters in markdown to prevent injection
+   * @param {string} text - Text to sanitize
+   * @returns {string} Sanitized text
+   */
+  static sanitizeMarkdown(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/[<>]/g, '')
+      .replace(/javascript:/gi, '')
+      .replace(/data:/gi, '')
+      .replace(/vbscript:/gi, '');
+  }
+
+  /**
    * Converts product information to Markdown format
    * @param {Object} product - Product information object
    * @returns {string} Markdown text
    */
   static toMarkdown(product) {
-    let markdown = `# ${product.name}\n\n`;
+    let markdown = `# ${this.sanitizeMarkdown(product.name)}\n\n`;
     
     if (product.price && product.price !== 'Price not available') {
-      markdown += `**Price**: ${product.price}\n\n`;
+      markdown += `**Price**: ${this.sanitizeMarkdown(product.price)}\n\n`;
     }
     
     if (product.description) {
-      markdown += `## Description\n\n${product.description}\n\n`;
+      markdown += `## Description\n\n${this.sanitizeMarkdown(product.description)}\n\n`;
     }
     
     if (product.features && product.features.length > 0) {
       markdown += `## Features\n\n`;
       for (const feature of product.features) {
-        markdown += `- ${feature}\n`;
+        markdown += `- ${this.sanitizeMarkdown(feature)}\n`;
       }
       markdown += '\n';
     }
@@ -241,12 +255,19 @@ export class ProductParser {
     if (product.specifications && Object.keys(product.specifications).length > 0) {
       markdown += `## Specifications\n\n`;
       for (const [key, value] of Object.entries(product.specifications)) {
-        markdown += `- **${key}**: ${value}\n`;
+        markdown += `- **${this.sanitizeMarkdown(key)}**: ${this.sanitizeMarkdown(value)}\n`;
       }
       markdown += '\n';
     }
     
-    markdown += `**Product URL**: ${product.url}\n`;
+    try {
+      const url = new URL(product.url);
+      if (['http:', 'https:'].includes(url.protocol)) {
+        markdown += `**Product URL**: ${product.url}\n`;
+      }
+    } catch {
+      markdown += `**Product URL**: [Invalid URL]\n`;
+    }
     
     return markdown;
   }
